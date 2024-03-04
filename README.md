@@ -1,10 +1,56 @@
 # OPM_transcriptome_assembly
 
+- [OPM_transcriptome_assembly](#opm-transcriptome-assembly)
+- [Objective](#objective)
+- [Experimental design](#experimental-design)
+- [Data](#data)
+- [Read processing](#read-processing)
+  * [Remove rare kmers with Rcorrector](#remove-rare-kmers-with-rcorrector)
+  * [Discard unfixable read pairs](#discard-unfixable-read-pairs)
+  * [Trimming](#trimming)
+  * [Remove rRNA](#remove-rrna)
+  * [Remove remaining over-represented sequences](#remove-remaining-over-represented-sequences)
+  * [Replace empty reads](#replace-empty-reads)
+- [De novo transcriptome assembly](#de-novo-transcriptome-assembly)
+  * [Pool all data](#pool-all-data)
+  * [Run Trinity](#run-trinity)
+- [NCBI submission](#ncbi-submission)
+- [Final statistics cleaned assembly](#final-statistics-cleaned-assembly)
+- [ORF prediction](#orf-prediction)
+  * [Step 1: extract the long open reading frames](#step-1--extract-the-long-open-reading-frames)
+  * [Step 2: predict the likely coding regions](#step-2--predict-the-likely-coding-regions)
+- [Trinotate annotation](#trinotate-annotation)
+  * [Install Trinotate and dependencies](#install-trinotate-and-dependencies)
+    + [Infernal](#infernal)
+    + [Diamond](#diamond)
+    + [Sqlite3](#sqlite3)
+    + [HMMER](#hmmer)
+    + [SignalP6](#signalp6)
+    + [TMHMM](#tmhmm)
+  * [Run Trinotate](#run-trinotate)
+- [RNA-seq analysis](#rna-seq-analysis)
+  * [Samples file](#samples-file)
+  * [Estimating Transcript Abundance](#estimating-transcript-abundance)
+    + [Salmon index](#salmon-index)
+    + [align and estimate abundance](#align-and-estimate-abundance)
+  * [DESeq2 analysis](#deseq2-analysis)
+    + [R libraries](#r-libraries)
+    + [Coldata](#coldata)
+    + [Read count matrix](#read-count-matrix)
+    + [PCA vst all samples](#pca-vst-all-samples)
+    + [PCA without outliers](#pca-without-outliers)
+    + [Read count filtering](#read-count-filtering)
+    + [Comparison Allergenic vs non-allergenic](#comparison-allergenic-vs-non-allergenic)
+    + [Pair-wise comparison of larval stages](#pair-wise-comparison-of-larval-stages)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
+
 Pipeline of the *de novo* transcriptome assembly of three larval stages of the oak processionary moth (OPM) (*Thaumetopoea processionea*).
 
 # Objective
 
-*Thaumetopoea processionea* moths cause health problem due to their urticant hairs [(Rahlenbeck 2015)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4513735/). The group of [Prof. Dr. med. Timo Buhl](https://hautklinik.umg.eu/forschung/arbeitsgruppen/prof-dr-med-timo-buhl-allergy-and-clinical-immunology/) want to identify candidate allergens that start being produced from larvae stage L3. Therefore, transcriptomic data are needed at larval stages before and after this transition to toxicity. 
+*Thaumetopoea processionea* moths cause health problem due to their urticant hairs [(Rahlenbeck 2015)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4513735/). The group of [Prof. Dr. med. Timo Buhl](https://hautklinik.umg.eu/forschung/arbeitsgruppen/prof-dr-med-timo-buhl-allergy-and-clinical-immunology/) want to identify candidate allergens that start being produced from larvae stage L3. Therefore, transcriptomic data are needed at larval stages before and after this transition to allergenicity. 
 
 
 # Experimental design
@@ -596,21 +642,21 @@ library("tximport")
 
 ### Coldata
 
-Create a `coldata` text file. First column should contain the sample name as in the count matrix. The second column contain the larval stage, and the third the toxicity status.
+Create a `coldata` text file. First column should contain the sample name as in the count matrix. The second column contain the larval stage, and the third the allergenicity status.
 
-| sample     | stage | toxicity |
+| sample     | stage | allergenicity |
 |------------|-------|----------|
-| OMP_2_rep1 | L2    | nontoxic |
-| OMP_2_rep2 | L2    | nontoxic |
-| OMP_2_rep3 | L2    | nontoxic |
-| OMP_2_rep4 | L2    | nontoxic |
-| OPM_4_rep1 | L4    | toxic    |
-| OPM_4_rep2 | L4    | toxic    |
-| OPM_4_rep3 | L4    | toxic    |
-| OPM_4_rep4 | L4    | toxic    |
-| OPM_5_rep1 | L5    | toxic    |
-| OPM_5_rep2 | L5    | toxic    |
-| OPM_5_rep4 | L5    | toxic    |
+| OMP_2_rep1 | L2    | non_allergenic |
+| OMP_2_rep2 | L2    | non_allergenic |
+| OMP_2_rep3 | L2    | non_allergenic |
+| OMP_2_rep4 | L2    | non_allergenic |
+| OPM_4_rep1 | L4    | allergenic    |
+| OPM_4_rep2 | L4    | allergenic    |
+| OPM_4_rep3 | L4    | allergenic    |
+| OPM_4_rep4 | L4    | allergenic    |
+| OPM_5_rep1 | L5    | allergenic    |
+| OPM_5_rep2 | L5    | allergenic    |
+| OPM_5_rep4 | L5    | allergenic    |
 
 
 ### Read count matrix
@@ -649,7 +695,7 @@ txi <- tximport(files, type="salmon", tx2gene=tx2gene)
 # Create a DESeq2 matrix
 dds <- DESeqDataSetFromTximport(txi,
                   colData = coldata,
-                  design = ~ toxicity)
+                  design = ~ allergenicity)
 
 ```
 
@@ -713,12 +759,12 @@ The samples cluster separately depending on their stage, with the stage L2 (red)
 
 ```{r, eval=FALSE}
 # Create PCA
-pcaData <- plotPCA(vsd, intgroup=c("sample", "toxicity"), returnData=TRUE)
+pcaData <- plotPCA(vsd, intgroup=c("sample", "allergenicity"), returnData=TRUE)
 
 # Get percentage variation
 percentVar <- round(100 * attr(pcaData, "percentVar"))
 
-p <- ggplot(pcaData, aes(PC1, PC2, color=toxicity, label = sample)) + 
+p <- ggplot(pcaData, aes(PC1, PC2, color=allergenicity, label = sample)) + 
   xlab(paste0("PC1: ",percentVar[1],"% variance")) +
   ylab(paste0("PC2: ",percentVar[2],"% variance")) +  theme_bw()
 
@@ -726,7 +772,7 @@ p + geom_text(size = 4)
 ```
 
 ![](images/PCA3.png)
-If we color-code the samples by toxicity, we can clearly see that the non-toxic stage (L2) and the two toxic stages (L4 and L5) cluster separately on the first principal component.
+If we color-code the samples by allergenicity, we can clearly see that the non-allergenic stage (L2) and the two allergenic stages (L4 and L5) cluster separately on the first principal component.
 
 
 ### Read count filtering
@@ -751,7 +797,7 @@ Remove all genes with less than 10 reads across all 9 samples.
 # Create a DESeq2 matrix
 dds <- DESeqDataSetFromTximport(txi,
                   colData = coldata,
-                  design = ~ toxicity)
+                  design = ~ allergenicity)
 
 dds <- dds[,!colnames(dds) %in% c("OPM_4_rep2","OPM_5_rep1")]
 
@@ -773,19 +819,21 @@ Check the trick for the lfcShrink with multiple levels (https://support.biocondu
 dds <- DESeq(dds)
 
 # Do pair-wise comparison of the 3 stages. Fix earlier stage as reference
-res_toxic_vs_nontoxic <- results(dds, contrast=c("toxicity","toxic","nontoxic"))
+res_allergenic_vs_non_allergenic <- results(dds, 
+  contrast=c("allergenicity","allergenic","non_allergenic"))
 
 # LFC shrinkage
-res_toxic_vs_nontoxic_lfc <- lfcShrink(dds=dds, coef="toxicity_toxic_vs_nontoxic", 
-                                       res=res_toxic_vs_nontoxic)
+res_allergenic_vs_non_allergenic_lfc <- lfcShrink(dds=dds, 
+        coef="allergenicity_allergenic_vs_non_allergenic",
+        res=res_allergenic_vs_non_allergenic, type="apeglm")
 
 # Retrieve only significant DEGs
-df_res_toxic_vs_nontoxic <- as.data.frame(res_toxic_vs_nontoxic_lfc) %>% 
+df_res_allergenic_vs_non_allergenic <- as.data.frame(res_allergenic_vs_non_allergenic_lfc) %>% 
   rownames_to_column("geneID") %>% filter(padj < 0.05)
 
 # Export as tabulated text files
-write.table(df_res_toxic_vs_nontoxic, 
-            "data/expression_analysis/df_res_toxic_vs_nontoxic.txt",
+write.table(df_res_allergenic_vs_non_allergenic, 
+            "data/expression_analysis/df_res_allergenic_vs_non_allergenic.txt",
             quote=FALSE, row.names=FALSE, sep="\t")
 
 ```
@@ -795,36 +843,77 @@ write.table(df_res_toxic_vs_nontoxic,
 
 Compare each stages, using the younger stage as reference.
 
+Remove all genes with less than 10 reads across all 9 samples.
+
+```{r, eval=FALSE}
+
+# Create a DESeq2 matrix
+dds <- DESeqDataSetFromTximport(txi,
+                  colData = coldata,
+                  design = ~ stage)
+
+dds <- dds[,!colnames(dds) %in% c("OPM_4_rep2","OPM_5_rep1")]
+
+keep <- rowSums(counts(dds)) >= 10
+dds <- dds[keep,]
+
+```
+
+The filtering kept 55509/99868 genes after filtering out low expressed genes.
+
+Compare each stages, using the younger stage as reference.
+
+
 ```{r, eval=FALSE}
 
 # Remake a deseq object to integrate the change
 dds <- DESeq(dds)
 
+# L5 vs L4
+dds$stage <- relevel(dds$stage, ref = "L4")  
+dds <- nbinomWaldTest(dds)
+resultsNames(dds)
+
 # Do pair-wise comparison of the 3 stages. Fix earlier stage as reference
-res_L4_vs_L5 <- results(dds, contrast=c("stage","L5","L4"))
+res_L5_vs_L4 <- results(dds, contrast=c("stage","L5","L4"))
+res_L5_vs_L4_lfc <- lfcShrink(dds=dds, coef="stage_L5_vs_L4", type="apeglm")
 
-res_L5_vs_L2 <- results(dds, contrast=c("stage","L5","L2"))
+df_res_L5_vs_L4 <- as.data.frame(res_L5_vs_L4_lfc) %>% 
+  rownames_to_column("geneID") %>% filter(padj < 0.05)
 
-res_L4_vs_L2 <- results(dds, contrast=c("stage","L4","L2"))
-
-# Retrieve only significant DEGs
-df_res_L4_vs_L5 <- as.data.frame(res_L4_vs_L5)
-  %>% rownames_to_column("geneID") %>% filter(padj < 0.05)
-
-df_res_L5_vs_L2 <- as.data.frame(res_L5_vs_L2) 
-  %>% rownames_to_column("geneID") %>% filter(padj < 0.05)
-
-df_res_L4_vs_L2 <- as.data.frame(res_L4_vs_L2) 
-  %>% rownames_to_column("geneID") %>% filter(padj < 0.05)
-
-# Export as tabulated text files
-write.table(df_res_L4_vs_L5, "data/df_res_L4_vs_L5.txt", 
-              quote=FALSE, row.names=FALSE, sep="\t")
-
-write.table(df_res_L5_vs_L2, "data/df_res_L5_vs_L2.txt", 
+write.table(df_res_L5_vs_L4, "data/expression_analysis/df_res_L5_vs_L4.txt", 
             quote=FALSE, row.names=FALSE, sep="\t")
 
-write.table(df_res_L4_vs_L2, "data/df_res_L4_vs_L2.txt", 
+
+# L5 vs L2
+dds$stage <- relevel(dds$stage, ref = "L2")  
+dds <- nbinomWaldTest(dds)
+resultsNames(dds)
+
+res_L5_vs_L2 <- results(dds, contrast=c("stage","L5","L2"))
+res_L5_vs_L2_lfc <- lfcShrink(dds=dds, coef="stage_L5_vs_L2",type="apeglm")
+
+df_res_L5_vs_L2 <- as.data.frame(res_L5_vs_L2_lfc) %>% 
+  rownames_to_column("geneID") %>% filter(padj < 0.05)
+
+write.table(df_res_L5_vs_L2, "data/expression_analysis/df_res_L5_vs_L2.txt", 
+            quote=FALSE, row.names=FALSE, sep="\t")
+
+# L4 vs L2
+dds$stage <- relevel(dds$stage, ref = "L2")  
+dds <- nbinomWaldTest(dds)
+resultsNames(dds)
+
+res_L4_vs_L2 <- results(dds, contrast=c("stage","L4","L2"))
+res_L4_vs_L2_lfc <- lfcShrink(dds=dds, coef="stage_L4_vs_L2", 
+                              res=res_L4_vs_L2, type="apeglm")
+
+df_res_L4_vs_L2 <- as.data.frame(res_L4_vs_L2_lfc) %>%
+  rownames_to_column("geneID") %>% filter(padj < 0.05)
+
+write.table(df_res_L4_vs_L2, "data/expression_analysis/df_res_L4_vs_L2.txt", 
             quote=FALSE, row.names=FALSE, sep="\t")
 
 ```
+
+Gather all the output files into one Excel file (Data File 5).
