@@ -42,8 +42,11 @@
     + [Read count filtering](#read-count-filtering)
     + [Comparison Allergenic vs non-allergenic](#comparison-allergenic-vs-non-allergenic)
     + [Pair-wise comparison of larval stages](#pair-wise-comparison-of-larval-stages)
+- [Authors](#authors)
+- [License](#license)
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
 
 
 Pipeline of the *de novo* transcriptome assembly of three larval stages of the oak processionary moth (OPM) (*Thaumetopoea processionea*).
@@ -917,3 +920,12 @@ write.table(df_res_L4_vs_L2, "data/expression_analysis/df_res_L4_vs_L2.txt",
 ```
 
 Gather all the output files into one Excel file (Data File 5).
+
+# Authors
+* **Johan Zicola** - [johanzi](https://github.com/johanzi)
+
+
+<div id='section-id-308'/>
+
+# License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
