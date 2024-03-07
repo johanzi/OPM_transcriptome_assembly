@@ -776,6 +776,7 @@ p + geom_text(size = 4)
 ```
 
 ![](images/PCA3.png)
+
 If we color-code the samples by allergenicity, we can clearly see that the non-allergenic stage (L2) and the two allergenic stages (L4 and L5) cluster separately on the first principal component.
 
 
@@ -920,7 +921,7 @@ write.table(df_res_L4_vs_L2, "data/expression_analysis/df_res_L4_vs_L2.txt",
 
 ```
 
-Gather all the output files into one Excel file (Data File 5).
+Gather all the output files into one Excel file ([Data File 5](https://doi.org/10.6084/m9.figshare.25333777.v1)).
 
 # Authors
 * **Johan Zicola** - [johanzi](https://github.com/johanzi)
