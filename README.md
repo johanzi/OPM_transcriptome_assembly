@@ -92,6 +92,7 @@ Summary from fastqc and multiqc on the 22 raw fastq files:
 | OPM_5_4_L1_1 |  83.0% |  49% |  47.3  |
 | OPM_5_4_L1_2 |  86.2% |  49% |  47.3  |
 
+Raw fastq files and the transcriptome shotgun assembly (TSA) are available on the NCBI BioProject [PRJNA1072613](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1072613) and [GKRZ00000000](https://www.ncbi.nlm.nih.gov/nuccore/GKRZ00000000), respectively.
 
 # Read processing
 
