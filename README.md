@@ -63,9 +63,10 @@ Larvae of *Thaumetopoea processionea* were all collected from a single nest in a
 
 # Data
 
-The data contain 3 stages (L2, L4, L5) with at least 3 biological replicates, 11 samples in total. Data are available on NCBI BioProject PRJNA1072613.
+The data contain 3 stages (L2, L4, L5) with at least 3 biological replicates, 11 samples in total. Raw fastq files and the transcriptome shotgun assembly (TSA) are available on the NCBI BioProject [PRJNA1072613](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1072613) and [GKRZ00000000](https://www.ncbi.nlm.nih.gov/nuccore/GKRZ00000000), respectively.
 
 Summary from fastqc and multiqc on the 22 raw fastq files:
+
 
 | Sample Name  | % Dups | % GC | M Seqs |
 |--------------|--------|------|--------|
@@ -92,7 +93,6 @@ Summary from fastqc and multiqc on the 22 raw fastq files:
 | OPM_5_4_L1_1 |  83.0% |  49% |  47.3  |
 | OPM_5_4_L1_2 |  86.2% |  49% |  47.3  |
 
-Raw fastq files and the transcriptome shotgun assembly (TSA) are available on the NCBI BioProject [PRJNA1072613](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1072613) and [GKRZ00000000](https://www.ncbi.nlm.nih.gov/nuccore/GKRZ00000000), respectively.
 
 # Read processing
 
