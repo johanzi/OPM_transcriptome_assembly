@@ -53,7 +53,7 @@ Pipeline of the *de novo* transcriptome assembly of three larval stages of the o
 
 # Objective
 
-*Thaumetopoea processionea* moths cause health problem due to their urticant hairs [(Rahlenbeck 2015)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4513735/). The group of [Prof. Dr. med. Timo Buhl](https://hautklinik.umg.eu/forschung/arbeitsgruppen/prof-dr-med-timo-buhl-allergy-and-clinical-immunology/) want to identify candidate allergens that start being produced from larvae stage L3. Therefore, transcriptomic data are needed at larval stages before and after this transition to allergenicity. 
+*Thaumetopoea processionea* moths cause health problem due to their urticant hairs [(Rahlenbeck 2015)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4513735/). The group of [Prof. Dr. med. Timo Buhl](https://hautklinik.umg.eu/forschung/arbeitsgruppen/prof-dr-med-timo-buhl-allergy-and-clinical-immunology/) want to identify candidate allergens that start being produced from larvae stage L3. Therefore, transcriptomic data are needed at larval stages before and after this transition to allergenicity. This work was published in [Zicola et al., 2024](https://bmcgenomdata.biomedcentral.com/articles/10.1186/s12863-024-01237-7).
 
 
 # Experimental design
