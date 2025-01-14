@@ -163,7 +163,7 @@ bowtie2-build -f LSU_SSU.fa LSU_SSU
 
 bowtie2 --nofw --quiet --very-sensitive-local --phred33  \
     -x LSU_SSU -1 unfixrm_OPM_2_1_L1_1.trimmed.fastq.gz \
-    -2 unfixrm_OPM_2_1_L1_2.trimmed.fastq.gz. \
+    -2 unfixrm_OPM_2_1_L1_2.trimmed.fastq.gz \
     --un-conc-gz unfixrm_OPM_2_1_L1.rRNA_removed.fq.gz > /dev/null
 
 ```
